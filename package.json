@@ -1,0 +1,27 @@
+{
+  "name": "storypoint",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/GwaraDon/StoryPointCalculator#readme",
+  "bugs": {
+    "url": "https://github.com/GwaraDon/StoryPointCalculator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GwaraDon/StoryPointCalculator.git"
+  },
+  "license": "ISC",
+  "author": "binay",
+  "type": "commonjs",
+  "main": "content.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.17"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.17"
+  }
+}
