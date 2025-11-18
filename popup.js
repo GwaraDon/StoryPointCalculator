@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateIcon = document.getElementById('calculateIcon');
     const calculateText = document.getElementById('calculateText');
     const totalPointsEl = document.getElementById('totalPoints');
+    const remainingPointsEl = document.getElementById('remainingPoints');
     const statusEl = document.getElementById('status');
     const statusContainer = document.getElementById('statusContainer');
 
@@ -57,7 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
     calculateBtn.addEventListener('click', () => {
         // Clear previous results and show loading
         totalPointsEl.textContent = '...';
+        remainingPointsEl.textContent = '...';
         totalPointsEl.classList.add('loading');
+        remainingPointsEl.classList.add('loading');
         setStatus('Calculating story points...', 'info');
         setLoadingState(true);
 
@@ -71,7 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, () => {
                     if (chrome.runtime.lastError) {
                         totalPointsEl.textContent = '—';
+                        remainingPointsEl.textContent = '—';
                         totalPointsEl.classList.remove('loading');
+                        remainingPointsEl.classList.remove('loading');
                         setStatus('Error: Please make sure you\'re on a Jira page', 'error');
                         setLoadingState(false);
                         console.error(chrome.runtime.lastError.message);
@@ -79,7 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 totalPointsEl.textContent = '—';
+                remainingPointsEl.textContent = '—';
                 totalPointsEl.classList.remove('loading');
+                remainingPointsEl.classList.remove('loading');
                 setStatus('Could not find active tab', 'error');
                 setLoadingState(false);
             }
@@ -91,26 +98,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if (request.action === "sendTotal") {
             setLoadingState(false);
             totalPointsEl.classList.remove('loading');
+            remainingPointsEl.classList.remove('loading');
             
-            if (request.total !== undefined && request.total > 0) {
-                // Display the total with animation
-                const resultCard = totalPointsEl.closest('.bg-white');
-                resultCard.classList.add('result-animate');
-                
-                // Format number (remove .00 if whole number)
-                const formattedTotal = request.total % 1 === 0 
-                    ? request.total.toString() 
-                    : request.total.toFixed(2);
-                
-                totalPointsEl.textContent = formattedTotal;
-                setStatus('Calculation complete!', 'success');
-                
-                // Remove animation class after animation completes
+            // Display total story points
+            const total = request.total !== undefined ? request.total : 0;
+            const formattedTotal = total % 1 === 0 
+                ? total.toString() 
+                : total.toFixed(2);
+            totalPointsEl.textContent = formattedTotal;
+            
+            // Display remaining count
+            const remaining = request.remaining !== undefined ? request.remaining : 0;
+            remainingPointsEl.textContent = remaining.toString();
+            
+            // Animate both cards
+            const resultCards = document.querySelectorAll('.bg-white.rounded-2xl');
+            resultCards.forEach(card => {
+                card.classList.add('result-animate');
                 setTimeout(() => {
-                    resultCard.classList.remove('result-animate');
+                    card.classList.remove('result-animate');
                 }, 300);
+            });
+            
+            // Set status message
+            if (total > 0 || remaining > 0) {
+                const messages = [];
+                if (total > 0) messages.push(`${formattedTotal} story points`);
+                if (remaining > 0) messages.push(`${remaining} remaining`);
+                setStatus(messages.join(' • '), 'success');
             } else {
-                totalPointsEl.textContent = '0';
                 setStatus('No story points found on this page', 'warning');
             }
         }
