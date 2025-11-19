@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const remainingPointsEl = document.getElementById('remainingPoints');
     const statusEl = document.getElementById('status');
     const statusContainer = document.getElementById('statusContainer');
-
+    const reloadBtn = document.getElementById('reloadBtn');
     // Helper function to set status with color
     function setStatus(message, type = 'info') {
         statusEl.textContent = message;
@@ -92,6 +92,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    reloadBtn.addEventListener('click', () => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]) {
+                const tabId = tabs[0].id;
+
+                // 1. Set status to reloading
+                setStatus('Reloading page...', 'info');
+
+                // 2. Create a listener to watch for the page load to finish
+                const onPageLoad = (updatedTabId, changeInfo) => {
+                    // Check if the updated tab is the one we reloaded AND if it is complete
+                    if (updatedTabId === tabId && changeInfo.status === 'complete') {
+                        
+                        // 3. Clear the status
+                        setStatus(''); 
+                        
+                        // 4. Remove this listener (clean up) so it doesn't keep running
+                        chrome.tabs.onUpdated.removeListener(onPageLoad);
+                    }
+                };
+
+                // 5. Add the listener BEFORE triggering reload
+                chrome.tabs.onUpdated.addListener(onPageLoad);
+
+                // 6. Trigger the reload
+                chrome.tabs.reload(tabId);
+
+            } else {
+                setStatus('No active tab found', 'error');
+            }
+        });
+    });
+    
 
     // Listen for messages from the content.js script
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
