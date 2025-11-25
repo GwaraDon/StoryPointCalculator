@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         remainingPointsEl.textContent = '...';
         totalPointsEl.classList.add('loading');
         remainingPointsEl.classList.add('loading');
-        setStatus('Calculating story points...', 'info');
+        setStatus('Loading all table data...', 'info');
         setLoadingState(true);
 
         // Get the current active tab
