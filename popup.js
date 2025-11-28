@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         processedTasksEl.classList.remove('loading');
 
                         setLoadingState(false);
-                        console.error(chrome.runtime.lastError.message);
+
                     }
                 });
             } else {
