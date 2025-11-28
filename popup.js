@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateText = document.getElementById('calculateText');
     const totalPointsEl = document.getElementById('totalPoints');
     const remainingPointsEl = document.getElementById('remainingPoints');
+    const processedTasksEl = document.getElementById('processedTasks');
     const reloadBtn = document.getElementById('reloadBtn');
 
 
@@ -13,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
             calculateBtn.disabled = true;
             calculateBtn.classList.add('opacity-75', 'cursor-not-allowed');
             calculateBtn.classList.remove('hover:scale-[1.02]', 'active:scale-[0.98]');
+
+            reloadBtn.disabled = true;
+            reloadBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            reloadBtn.classList.remove('hover:scale-[1.02]', 'active:scale-[0.98]');
 
             // Show spinner
             calculateIcon.innerHTML = `
@@ -25,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
             calculateBtn.disabled = false;
             calculateBtn.classList.remove('opacity-75', 'cursor-not-allowed');
             calculateBtn.classList.add('hover:scale-[1.02]', 'active:scale-[0.98]');
+
+            reloadBtn.disabled = false;
+            reloadBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            reloadBtn.classList.add('hover:scale-[1.02]', 'active:scale-[0.98]');
 
             // Restore original icon
             calculateIcon.innerHTML = `
@@ -39,8 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear previous results and show loading
         totalPointsEl.textContent = '...';
         remainingPointsEl.textContent = '...';
+        processedTasksEl.textContent = '...';
         totalPointsEl.classList.add('loading');
         remainingPointsEl.classList.add('loading');
+        processedTasksEl.classList.add('loading');
 
         setLoadingState(true);
 
@@ -55,8 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (chrome.runtime.lastError) {
                         totalPointsEl.textContent = '—';
                         remainingPointsEl.textContent = '—';
+                        processedTasksEl.textContent = '—';
                         totalPointsEl.classList.remove('loading');
                         remainingPointsEl.classList.remove('loading');
+                        processedTasksEl.classList.remove('loading');
 
                         setLoadingState(false);
                         console.error(chrome.runtime.lastError.message);
@@ -65,8 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 totalPointsEl.textContent = '—';
                 remainingPointsEl.textContent = '—';
+                processedTasksEl.textContent = '—';
                 totalPointsEl.classList.remove('loading');
                 remainingPointsEl.classList.remove('loading');
+                processedTasksEl.classList.remove('loading');
 
                 setLoadingState(false);
             }
@@ -109,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setLoadingState(false);
             totalPointsEl.classList.remove('loading');
             remainingPointsEl.classList.remove('loading');
+            processedTasksEl.classList.remove('loading');
 
             // Display total story points
             const total = request.total !== undefined ? request.total : 0;
@@ -120,6 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Display remaining count
             const remaining = request.remaining !== undefined ? request.remaining : 0;
             remainingPointsEl.textContent = remaining.toString();
+
+            // Display processed tasks count
+            const processed = request.processed !== undefined ? request.processed : 0;
+            processedTasksEl.textContent = processed.toString();
 
             // Animate both cards
             const resultCards = document.querySelectorAll('.bg-white.rounded-2xl');
