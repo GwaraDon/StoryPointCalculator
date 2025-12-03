@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const remainingPointsEl = document.getElementById('remainingPoints');
     const processedTasksEl = document.getElementById('processedTasks');
     const reloadBtn = document.getElementById('reloadBtn');
-
+    const copyBtn = document.getElementById('copyBtn');
+    const copyIcon = document.getElementById('copyIcon');
 
     // Helper function to show loading state
     function setLoadingState(isLoading) {
@@ -70,9 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         totalPointsEl.classList.remove('loading');
                         remainingPointsEl.classList.remove('loading');
                         processedTasksEl.classList.remove('loading');
-
                         setLoadingState(false);
-
                     }
                 });
             } else {
@@ -82,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalPointsEl.classList.remove('loading');
                 remainingPointsEl.classList.remove('loading');
                 processedTasksEl.classList.remove('loading');
-
                 setLoadingState(false);
             }
         });
@@ -92,16 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs[0]) {
                 const tabId = tabs[0].id;
-
-
-
                 // 2. Create a listener to watch for the page load to finish
                 const onPageLoad = (updatedTabId, changeInfo) => {
                     // Check if the updated tab is the one we reloaded AND if it is complete
                     if (updatedTabId === tabId && changeInfo.status === 'complete') {
-
-
-
                         // 4. Remove this listener (clean up) so it doesn't keep running
                         chrome.tabs.onUpdated.removeListener(onPageLoad);
                     }
@@ -115,6 +107,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }
         });
+    });
+
+    // Copy total points to clipboard
+    copyBtn.addEventListener('click', async () => {
+        const totalPoints = totalPointsEl.textContent.trim();
+        
+        // Don't copy if it's a placeholder
+        if (totalPoints === '-' || totalPoints === '...' || !totalPoints) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(totalPoints);
+            
+            // Visual feedback: change icon to checkmark temporarily
+            const originalIcon = copyIcon.innerHTML;
+            copyIcon.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            `;
+            copyIcon.classList.remove('text-gray-500', 'hover:text-indigo-600');
+            copyIcon.classList.add('text-green-500');
+            
+            // Restore original icon after 2 seconds
+            setTimeout(() => {
+                copyIcon.innerHTML = originalIcon;
+                copyIcon.classList.remove('text-green-500');
+                copyIcon.classList.add('text-gray-500', 'hover:text-indigo-600');
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            // Fallback: show error feedback
+            copyIcon.classList.add('text-red-500');
+            setTimeout(() => {
+                copyIcon.classList.remove('text-red-500');
+                copyIcon.classList.add('text-gray-500', 'hover:text-indigo-600');
+            }, 2000);
+        }
     });
 
 

@@ -5,7 +5,6 @@
  */
 (function () {
 
-
     // Function to calculate story points from current DOM and return processed element IDs
     function calculateStoryPoints(processedElements) {
         let total = 0;
@@ -56,11 +55,9 @@
             if (text && text !== 'None' && !isNaN(parseFloat(text))) {
                 const points = parseFloat(text);
                 total += points;
-
             } else if (text === 'None' || text === '') {
                 // Count issues with "None" or empty story points
                 remainingCount++;
-
             }
         });
 
@@ -77,13 +74,10 @@
         const scrollDelay = 400; // Wait 400ms between scrolls for content to load
         const scrollStep = 500; // Scroll in increments of 500px
 
-
-
         // Find the Jira scroll container
         const jiraScrollContainer = document.querySelector('[data-testid="native-issue-table.ui.scroll-container.scroll-container"]');
 
         if (!jiraScrollContainer) {
-
             // Fallback calculation
             const result = calculateStoryPoints(processedElements);
             return { total: result.total, remainingCount: result.remainingCount, processedCount: result.processedCount };
@@ -104,13 +98,10 @@
             accumulatedTotal += result.total;
             accumulatedRemaining += result.remainingCount;
 
-
-
             // If no new data found, increment counter
             if (result.newProcessed.size === 0) {
                 noNewDataCount++;
                 if (noNewDataCount >= maxNoNewDataCount) {
-
                     break;
                 }
             } else {
@@ -123,7 +114,6 @@
 
             // Check if we've reached the bottom (can't scroll further)
             if (nextScrollTop >= maxScrollHeight - 10) {
-
                 // One final check for any remaining items
                 const finalResult = calculateStoryPoints(processedElements);
                 accumulatedTotal += finalResult.total;
@@ -152,8 +142,6 @@
         accumulatedTotal += finalResult.total;
         accumulatedRemaining += finalResult.remainingCount;
 
-
-
         return { total: accumulatedTotal, remainingCount: accumulatedRemaining, processedCount: processedElements.size };
     }
 
@@ -161,9 +149,6 @@
     (async () => {
         try {
             const { total, remainingCount, processedCount } = await loadAllTableData();
-
-
-
             // Send both totals back to the popup.js
             chrome.runtime.sendMessage({
                 action: "sendTotal",
@@ -172,7 +157,6 @@
                 processed: processedCount
             });
         } catch (error) {
-
             // Fallback: calculate with whatever is available
             const processedElements = new Set();
             const { total, remainingCount, processedCount } = calculateStoryPoints(processedElements);
